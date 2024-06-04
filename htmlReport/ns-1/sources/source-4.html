@@ -1,0 +1,416 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > Words</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.hit</a>
+</div>
+
+<h1>Coverage Summary for Class: Words (org.hit)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Words</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    70.5%
+  </span>
+  <span class="absValue">
+    (79/112)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    89.7%
+  </span>
+  <span class="absValue">
+    (139/155)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.hit;
+&nbsp;
+&nbsp;import java.util.*;
+&nbsp;import java.io.*;
+&nbsp;
+&nbsp;public class Words {
+&nbsp;    WordNode root; // 有向图入口
+&nbsp;    List&lt;WordNode&gt; nodelist; // 存储有向图所有结点的列表
+&nbsp;    public InteractiveGraph graph; // Java绘图相关API
+&nbsp;    int num; // nodelist列表长度
+<b class="fc">&nbsp;    public Words(String filename) {</b>
+<b class="fc">&nbsp;        root=null;</b>
+<b class="fc">&nbsp;        nodelist = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        num = 0 ;</b>
+<b class="fc">&nbsp;        readFromFile(filename);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // 需求3 查询桥接词
+&nbsp;    // 返回一个包含着所有桥接词的List 或者 null
+&nbsp;    public List&lt;String&gt; queryBridgeWords(String word1,String word2,int logmode) {
+<b class="fc">&nbsp;        WordNode node1=null;</b>
+<b class="fc">&nbsp;        WordNode node2=null;</b>
+<b class="fc">&nbsp;        List&lt;String&gt; bridgeWords = new ArrayList&lt;&gt;();</b>
+<b class="pc">&nbsp;        for (WordNode node : this.nodelist) {</b>
+<b class="fc">&nbsp;            if (node.words.equals(word1)) {</b>
+<b class="fc">&nbsp;                node1 = node;</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+<b class="pc">&nbsp;        for (WordNode node : this.nodelist) {</b>
+<b class="fc">&nbsp;            if (node.words.equals(word2)) {</b>
+<b class="fc">&nbsp;                node2 = node;</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+<b class="pc">&nbsp;        if (node1 == null &amp;&amp; node2 != null){</b>
+&nbsp;            // 输出报错信息
+<b class="nc">&nbsp;            if (logmode == 1) System.out.println(&quot;[-] No \&quot;&quot;+word1+&quot;\&quot;&quot;+&quot;in the graph&quot;);</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="pc">&nbsp;        if (node1 != null &amp;&amp; node2 == null){</b>
+<b class="nc">&nbsp;            if (logmode == 1) System.out.println(&quot;[-] No \&quot;&quot;+word2+&quot;\&quot; in the graph&quot;);</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="pc">&nbsp;        if(node1 == null){</b>
+<b class="nc">&nbsp;            if (logmode == 1) System.out.println(&quot;[-] No \&quot;&quot;+word1+&quot;\&quot; and \&quot;&quot;+ word2 +&quot;\&quot; in the graph&quot;);</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;//        System.out.println(node1);
+<b class="fc">&nbsp;        List&lt;WordNode&gt; middlelist = new ArrayList&lt;&gt;(node1.getNextlist());</b>
+&nbsp;
+<b class="fc">&nbsp;        for (WordNode node : middlelist){</b>
+&nbsp;//            System.out.println(node.words);
+<b class="fc">&nbsp;            if (node.findNextNode(word2) != -1){</b>
+<b class="fc">&nbsp;                bridgeWords.add(node.words);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        if (bridgeWords.isEmpty()){</b>
+<b class="pc">&nbsp;            if (logmode == 1) System.out.println(&quot;[-] No bridge words from \&quot;&quot;+word1+&quot;\&quot; to \&quot;&quot;+word2+&quot;\&quot;&quot;);</b>
+&nbsp;        }
+&nbsp;        else{
+<b class="pc">&nbsp;            if (logmode == 1) System.out.print(&quot;[+] The bridge words from \&quot;&quot;+word1+&quot;\&quot; to \&quot;&quot;+word2+&quot;\&quot; is: &quot;);</b>
+<b class="fc">&nbsp;            for (String output: bridgeWords){</b>
+<b class="pc">&nbsp;                if (logmode == 1) System.out.print(output+&quot; &quot;);</b>
+&nbsp;            }
+<b class="pc">&nbsp;            if (logmode == 1) System.out.print(&quot;\n&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return bridgeWords;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // 需求2 绘制有向图
+&nbsp;    public void showDirectedGraph(Words entry){
+<b class="fc">&nbsp;        graph = new InteractiveGraph();</b>
+<b class="fc">&nbsp;        graph.graph_root = this;</b>
+<b class="fc">&nbsp;        for(WordNode node : entry.nodelist){</b>
+<b class="fc">&nbsp;            graph.addNode(node.words);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        for(WordNode node : entry.nodelist){</b>
+<b class="fc">&nbsp;            node.addedgeGraph(graph);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // 需求4 根据桥接词生成新文本
+&nbsp;    public String generateNewText(String inputtext){
+<b class="fc">&nbsp;        String[] parts = inputtext.split(&quot; &quot;);</b>
+<b class="fc">&nbsp;        StringBuilder output = new StringBuilder();</b>
+&nbsp;        List&lt;String&gt; bridgeWords;
+<b class="fc">&nbsp;        Random rand = new Random();</b>
+<b class="pc">&nbsp;        if (parts.length == 1 || parts.length == 0){</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        for (int i = 0; i &lt; parts.length - 1; i++){</b>
+<b class="fc">&nbsp;            output.append(parts[i]);</b>
+<b class="fc">&nbsp;            output.append(&quot; &quot;);</b>
+<b class="fc">&nbsp;            bridgeWords = queryBridgeWords(parts[i], parts[i+1], 0);</b>
+<b class="pc">&nbsp;            if(bridgeWords==null|| bridgeWords.isEmpty()){</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;            else{
+<b class="fc">&nbsp;                int choice = rand.nextInt(bridgeWords.size());</b>
+<b class="fc">&nbsp;                output.append(bridgeWords.get(choice));</b>
+<b class="fc">&nbsp;                output.append(&quot; &quot;);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        output.append(parts[parts.length-1]);</b>
+<b class="fc">&nbsp;        return output.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //需求5 计算两个单词之间最短路径
+&nbsp;    public String calcShortestPath(String word1, String word2){
+<b class="fc">&nbsp;        StringBuilder output = new StringBuilder();</b>
+<b class="fc">&nbsp;        int[] dis = new int[num];</b>
+<b class="fc">&nbsp;        int[] from = new int[num];</b>
+<b class="fc">&nbsp;        for(int i = 0; i &lt; num; i++){</b>
+<b class="fc">&nbsp;            from[i] = -1;</b>
+<b class="fc">&nbsp;            dis[i] = -1;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        Deque&lt;Integer&gt; queue = new ArrayDeque&lt;&gt;();</b>
+<b class="fc">&nbsp;        WordNode start = this.findNode(word1);</b>
+<b class="fc">&nbsp;        int start_idx = this.findIndex(start);</b>
+<b class="fc">&nbsp;        WordNode end = this.findNode(word2);</b>
+<b class="fc">&nbsp;        int end_idx = this.findIndex(end);</b>
+&nbsp;        int tmp_idx;
+&nbsp;        WordNode cur_node;
+&nbsp;        int cur_idx;
+&nbsp;        int next_idx;
+&nbsp;
+<b class="pc">&nbsp;        if (start == null || end == null){</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;        
+&nbsp;        // 宽搜
+<b class="fc">&nbsp;        for (WordNode node: start.getNextlist()) {</b>
+<b class="fc">&nbsp;            tmp_idx = this.findIndex(node);</b>
+<b class="fc">&nbsp;            queue.add(tmp_idx);</b>
+<b class="fc">&nbsp;            dis[tmp_idx] = start.getValuelist().get(start.getNextlist().indexOf(node));</b>
+<b class="fc">&nbsp;            from[tmp_idx] = start_idx;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        while (!queue.isEmpty()){</b>
+<b class="fc">&nbsp;            cur_idx = queue.poll();</b>
+<b class="fc">&nbsp;            if (cur_idx == start_idx){</b>
+&nbsp;                continue;
+&nbsp;            }
+<b class="fc">&nbsp;            cur_node = this.nodelist.get(cur_idx);</b>
+<b class="fc">&nbsp;            for (WordNode next : cur_node.getNextlist()){</b>
+<b class="fc">&nbsp;                next_idx = this.findIndex(next);</b>
+<b class="fc">&nbsp;                int diff = cur_node.getValuelist().get(cur_node.getNextlist().indexOf(next));</b>
+<b class="fc">&nbsp;                if (dis[next_idx] == -1){</b>
+<b class="fc">&nbsp;                    dis[next_idx] = dis[cur_idx] + diff;</b>
+<b class="fc">&nbsp;                    from[next_idx] = cur_idx;</b>
+<b class="fc">&nbsp;                    queue.add(next_idx);</b>
+&nbsp;                }
+&nbsp;                else{
+<b class="pc">&nbsp;                    if (dis[next_idx] &gt; dis[cur_idx] + diff){</b>
+<b class="nc">&nbsp;                        dis[next_idx] = dis[cur_idx] + diff;</b>
+<b class="nc">&nbsp;                        from[next_idx] = cur_idx;</b>
+<b class="nc">&nbsp;                        queue.add(next_idx);</b>
+&nbsp;                    }
+&nbsp;                    else{
+&nbsp;                        continue;
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;        }
+&nbsp;
+&nbsp;//        for (int i = 0;i &lt; num;i++){
+&nbsp;//            System.out.print(nodelist.get(i).words);
+&nbsp;//            System.out.print(dis[i]+&quot; &quot;);
+&nbsp;//        }
+&nbsp;
+&nbsp;        // 如果不可达则返回null
+<b class="pc">&nbsp;        if (dis[end_idx] == -1){</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;        // 否则返回一个String，标识最短路径
+<b class="fc">&nbsp;        List&lt;String&gt; res = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        tmp_idx = end_idx;</b>
+<b class="fc">&nbsp;        while (tmp_idx!=start_idx){</b>
+<b class="fc">&nbsp;            res.add(this.nodelist.get(tmp_idx).words);</b>
+<b class="fc">&nbsp;            tmp_idx = from[tmp_idx];</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        output.append(start.words);</b>
+<b class="fc">&nbsp;        for(int i = res.size()-1;i&gt;=0;i--){</b>
+<b class="fc">&nbsp;            output.append(&quot;-&gt;&quot;);</b>
+<b class="fc">&nbsp;            output.append(res.get(i));</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return output.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // 需求6 随机游走
+&nbsp;    // 用int列表存储边的映射
+&nbsp;    public String randomWalk(){
+<b class="fc">&nbsp;        StringBuilder output = new StringBuilder();</b>
+<b class="fc">&nbsp;        List&lt;Integer&gt; used_edge = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        Random rand = new Random();</b>
+<b class="fc">&nbsp;        int start_idx = rand.nextInt(num);</b>
+&nbsp;        int next_idx;
+<b class="fc">&nbsp;        int cur_idx = start_idx;</b>
+&nbsp;        int r;
+&nbsp;
+&nbsp;        WordNode next_node;
+<b class="fc">&nbsp;        WordNode cur_node = this.nodelist.get(start_idx);</b>
+&nbsp;
+<b class="fc">&nbsp;        output.append(this.nodelist.get(start_idx).words);</b>
+<b class="fc">&nbsp;        output.append(&quot; &quot;);</b>
+&nbsp;        while(true){
+<b class="fc">&nbsp;            r = cur_node.getNextlist().size();</b>
+<b class="fc">&nbsp;            if (r &lt;= 0) break;</b>
+<b class="fc">&nbsp;            r = rand.nextInt(r);</b>
+<b class="fc">&nbsp;            next_node = cur_node.getNextlist().get(r);</b>
+<b class="fc">&nbsp;            next_idx = this.findIndex(next_node);</b>
+<b class="pc">&nbsp;            if(used_edge.contains((cur_idx&lt;&lt;16)+next_idx)){</b>
+<b class="nc">&nbsp;                output.append(next_node.words);</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;            else{
+<b class="fc">&nbsp;                used_edge.add((cur_idx&lt;&lt;16)+next_idx);</b>
+<b class="fc">&nbsp;                output.append(next_node.words);</b>
+<b class="fc">&nbsp;                output.append(&quot; &quot;);</b>
+<b class="fc">&nbsp;                cur_node = next_node;</b>
+<b class="fc">&nbsp;                cur_idx = next_idx;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return output.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;//    public static void main(String[] args) {
+&nbsp;//        SwingUtilities.invokeLater(Words::new);
+&nbsp;//    }
+&nbsp;
+&nbsp;    // 基础设施
+&nbsp;    private WordNode findNode(String words){
+<b class="fc">&nbsp;        for (WordNode i : nodelist){</b>
+<b class="fc">&nbsp;            if (i.words.equals(words)){</b>
+<b class="fc">&nbsp;                return i;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;    private int findIndex(WordNode node){
+<b class="pc">&nbsp;        if(node == null){</b>
+<b class="nc">&nbsp;            return -1;</b>
+&nbsp;        }
+<b class="pc">&nbsp;        for (int i =0; i &lt; nodelist.size(); i++){</b>
+<b class="fc">&nbsp;            if (nodelist.get(i).words.equals(node.words)){</b>
+<b class="fc">&nbsp;                return i;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return -1;</b>
+&nbsp;    }
+&nbsp;    private void readFromFile(String filename){
+<b class="fc">&nbsp;        File f = new File(filename);</b>
+<b class="fc">&nbsp;        try(InputStream is = new FileInputStream(f);) {</b>
+&nbsp;            char input_c;
+<b class="fc">&nbsp;            String cur_input = &quot;&quot;;</b>
+<b class="fc">&nbsp;            String former_input = null;</b>
+<b class="fc">&nbsp;            int total = is.available();</b>
+<b class="fc">&nbsp;            for (int i = 0 ;i &lt; total;i++){</b>
+<b class="fc">&nbsp;                input_c = (char)is.read();</b>
+<b class="pc">&nbsp;                if ((input_c&lt;=&#39;z&#39;&amp;&amp;input_c&gt;=&#39;a&#39;)||(input_c&lt;=&#39;Z&#39;&amp;&amp;input_c&gt;=&#39;A&#39;)){</b>
+<b class="fc">&nbsp;                    cur_input = cur_input.concat(String.valueOf(input_c));</b>
+&nbsp;                }
+&nbsp;                // 如果读到非英文字符则中断
+&nbsp;                // 按空格处理
+&nbsp;                else{
+<b class="pc">&nbsp;                    if(cur_input.length()==0){</b>
+&nbsp;                        continue;
+&nbsp;                    }
+&nbsp;                    else{
+&nbsp;//                        System.out.println(cur_input);
+<b class="fc">&nbsp;                        if (findNode(cur_input)==null){</b>
+<b class="fc">&nbsp;                            nodelist.add(new WordNode(cur_input));</b>
+<b class="fc">&nbsp;                            num += 1;</b>
+&nbsp;                        }
+&nbsp;
+<b class="fc">&nbsp;                        if (former_input == null){</b>
+<b class="fc">&nbsp;                            root = findNode(cur_input);</b>
+<b class="fc">&nbsp;                            former_input = cur_input;</b>
+&nbsp;                        }
+&nbsp;                        else{
+<b class="fc">&nbsp;                            WordNode f_node = findNode(former_input);</b>
+<b class="fc">&nbsp;                            WordNode c_node = findNode(cur_input);</b>
+<b class="pc">&nbsp;                            if (c_node!=null &amp;&amp; f_node!= null){</b>
+<b class="fc">&nbsp;                                f_node.addedge(c_node);</b>
+&nbsp;                            }
+<b class="fc">&nbsp;                            former_input = cur_input;</b>
+&nbsp;                        }
+<b class="fc">&nbsp;                        cur_input = &quot;&quot;;</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+<b class="fc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-06-05 00:40</div>
+</div>
+</body>
+</html>

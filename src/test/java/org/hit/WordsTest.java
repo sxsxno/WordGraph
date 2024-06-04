@@ -7,6 +7,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -24,11 +25,11 @@ public class WordsTest {
 
 
     @Test
-    public void calcShortestPath() {
+    public void queryBridgeWords() {
         System.out.println("测试ING");
         String filename = "test.txt";
         try{
-            String data = "Hello I am a guy with I am a guy happy every day";
+            String data = "Hello I am a guy with I am a guy happy every day a guy a mother with ";
             File file = new File(filename);
             if(!file.exists()){
                 file.createNewFile();
@@ -41,10 +42,34 @@ public class WordsTest {
             e.printStackTrace();
         }
         Words root = new Words(filename);
-        String word1 = "a";
-        String word2 = "a";
-        String res = root.calcShortestPath(word1,word2);
+        String word1 = "I";
+        String word2 = "Hello";
+        List<String> res = root.queryBridgeWords(word1,word2,0);
         System.out.println(res);
-        assertEquals("a",res);
+    }
+
+    @Test
+    public void calShortPath() {
+        System.out.println("测试ING");
+        String filename = "test.txt";
+        try{
+            String data = "Hello I am a guy with I am a guy happy every day a guy a mother with ";
+            File file = new File(filename);
+            if(!file.exists()){
+                file.createNewFile();
+                FileWriter fileWritter = new FileWriter(file.getName(),true);
+                fileWritter.write(data);
+                fileWritter.close();
+                System.out.println("new file Done");
+            }
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+        Words root = new Words(filename);
+        String word1 = "I";
+        String word2 = "Hello";
+        String res = root.calcShortestPath(word1,word2);
+//        assertEquals();
+        System.out.println(res);
     }
 }

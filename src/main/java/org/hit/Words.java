@@ -46,7 +46,9 @@ public class Words {
             if (logmode == 1) System.out.println("[-] No \""+word1+"\" and \""+ word2 +"\" in the graph");
             return null;
         }
+//        System.out.println(node1);
         List<WordNode> middlelist = new ArrayList<>(node1.getNextlist());
+
         for (WordNode node : middlelist){
 //            System.out.println(node.words);
             if (node.findNextNode(word2) != -1){
