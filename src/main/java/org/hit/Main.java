@@ -2,18 +2,22 @@ package org.hit;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class Main {
 
     public static void main(String[] args) {
-        Words root = new Words("D:\\javaproject\\WordGraph\\src\\main\\java\\org\\hit\\test.txt");
-        List<String> bridgewords = new ArrayList<>();
-//        root.showDirectedGraph(root);
-        bridgewords = root.queryBridgeWords("exciting","synergies",1);
-        System.out.println(root.generateNewText("seek to explore new and exciting synergies"));
-        System.out.println(root.calcShortestPath("To","and"));
-        System.out.println(root.randomWalk());
-        // System.out.println("Hello");
+        // 启动时需加入待分析文件作为参数
+        if (args.length < 1) {
+            System.out.println("Need input text file.\n");
+            System.exit(1);
+        }
+        String inputFilePath = args[0];
+        Words root = new Words(inputFilePath);
+        root.showDirectedGraph(root);
+//        bridgewords = root.queryBridgeWords("strange","new",1);
+//        System.out.println(root.generateNewText("seek to explore new and exciting synergies"));
+//        System.out.println(root.calcShortestPath("To","and"));
+//        System.out.println(root.randomWalk());
+        System.out.println("Service running\n");
     }
 }

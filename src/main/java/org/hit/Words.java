@@ -1,68 +1,12 @@
 package org.hit;
 
-import java.io.*;
 import java.util.*;
-
-class WordNode{
-    public String words; // 单词
-    private List<WordNode> nextlist; // 有向图中的后继结点
-    private List<Integer> valuelist; // 后继节点的边权值
-    public int num; // next列表长度
-    WordNode(String words) {
-        this.num = 0;
-        this.words = words;
-        valuelist = new ArrayList<>();
-        nextlist = new ArrayList<>();
-    }
-    // 根据String查找本结点是否有对应的后继结点
-    // 返回-1表示没找到，非-1表示对应的在nextlist中的索引
-    public int findNextNode(String nodewords) {
-        for(int i = 0; i<num ; i++){
-            if(nextlist.get(i).words.equals(nodewords)){
-                return i;
-            }
-        }
-        return -1;
-    }
-    // 在图像上加边
-    public void addedgeGraph (InteractiveGraph graph){
-        WordNode tmp;
-        for (int i = 0; i < num; i++) {
-            tmp = nextlist.get(i);
-            graph.connectNodes(this.words, tmp.words);
-        }
-    }
-    // 在数据结构中加边
-    public void addedge (WordNode nextone){
-//        System.out.println(this.words + " " + nextone.words);
-        int idx = findNextNode(nextone.words);
-        if(idx == -1){
-            nextlist.add(nextone);
-            valuelist.add(1);
-            num += 1;
-        }
-        else{
-            int tmp = valuelist.get(idx);
-            valuelist.set(idx, tmp+1);
-        }
-    }
-
-
-    public List<WordNode> getNextlist(){
-        return this.nextlist;
-    }
-    public List<Integer> getValuelist(){
-        return this.valuelist;
-    }
-}
-
-
-
+import java.io.*;
 
 public class Words {
     WordNode root; // 有向图入口
     List<WordNode> nodelist; // 存储有向图所有结点的列表
-    public InteractiveGraph graph;
+    public InteractiveGraph graph; // Java绘图相关API
     int num; // nodelist列表长度
     public Words(String filename) {
         root=null;
@@ -147,7 +91,7 @@ public class Words {
             output.append(parts[i]);
             output.append(" ");
             bridgeWords = queryBridgeWords(parts[i], parts[i+1], 0);
-            if(bridgeWords==null){
+            if(bridgeWords==null|| bridgeWords.isEmpty()){
                 continue;
             }
             else{
@@ -261,7 +205,9 @@ public class Words {
         output.append(this.nodelist.get(start_idx).words);
         output.append(" ");
         while(true){
-            r = rand.nextInt(cur_node.getNextlist().size());
+            r = cur_node.getNextlist().size();
+            if (r <= 0) break;
+            r = rand.nextInt(r);
             next_node = cur_node.getNextlist().get(r);
             next_idx = this.findIndex(next_node);
             if(used_edge.contains((cur_idx<<16)+next_idx)){
@@ -294,6 +240,9 @@ public class Words {
         return null;
     }
     private int findIndex(WordNode node){
+        if(node == null){
+            return -1;
+        }
         for (int i =0; i < nodelist.size(); i++){
             if (nodelist.get(i).words.equals(node.words)){
                 return i;
